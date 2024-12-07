@@ -4,32 +4,23 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 const sequelize = require('./utils/database'); 
-
-//controls
-const userControl = require('./controllers/user')
-
+const router = require('./routes/user')
+app.use(express.static(path.join(__dirname, 'static')));
 
 app.use(cors());
 app.use(bodyParser.json({extended:false}));
-// app.use(express.static(path.join(__dirname,'public')))
-app.set('view engine','ejs')
-app.set('views','views')
+// app.use(express.static(path.join(__dirname,'views')))
+// app.set('view engine','ejs')
+// app.set('views','views')
 
-
-
-app.post('/add-user', userControl.createUser);
-app.get('/add-user',userControl.fetchUsers);
-app.put('/add-user/:id', userControl.updateUser);
-app.delete('/add-user/:id', userControl.deleteUser);
-
-
+app.use('/users',router)
 
 app.use((req,res)=>{
-    res.status(404).send('404 page not found!')
+    res.status(404).render('404',{ title: '404 - Page Not Found' })
 })
 app.options('*', cors());
 sequelize
-  .sync({ alter: true }) 
+  .sync()
   .then(() => {
     app.listen(3000, () => {
       console.log('Server running on http://localhost:3000');
